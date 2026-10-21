@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+<title>AI-отдел продаж для продакшна</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: монтажная лента — каждый раздел это «кадр» с таймкодом слева; акцент — зелёный хромакей */
+:root {
+  --paper: #EDF0EC;
+  --panel: #E2E7E1;
+  --card: #F7F8F5;
+  --ink: #131816;
+  --muted: #56615B;
+  --line: #C6CDC6;
+  --key: #078C40;
+  --key-soft: #CFE9D8;
+  --rec: #D23A2A;
+  --display: "Oswald", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --body: "Golos Text", "Segoe UI", Roboto, system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #101412; --panel: #171D1A; --card: #1C2420; --ink: #E6EBE6; --muted: #929D96;
+    --line: #2B3530; --key: #34C772; --key-soft: #173826; --rec: #F0604F; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #101412; --panel: #171D1A; --card: #1C2420; --ink: #E6EBE6; --muted: #929D96;
+  --line: #2B3530; --key: #34C772; --key-soft: #173826; --rec: #F0604F; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--paper); color: var(--ink);
+  font-family: var(--body); font-size: 16px; line-height: 1.6;
+}
+.wrap {
+  max-width: 1120px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+h1, h2, h3 { font-family: var(--display); font-weight: 700; text-transform: uppercase; line-height: 1.05; text-wrap: balance; margin: 0; letter-spacing: .01em; }
+h1 { font-size: clamp(2.4rem, 6vw, 4.6rem); }
+h2 { font-size: clamp(1.8rem, 3.6vw, 2.8rem); }
+h3 { font-size: 1.35rem; font-weight: 500; }
+p { margin: 0; }
+.tc { font-family: var(--mono); font-size: .78rem; letter-spacing: .08em; color: var(--muted); text-transform: uppercase; }
+.key { color: var(--key); }
+.lead { font-size: 1.15rem; color: var(--muted); max-width: 60ch; }
+
+/* top bar */
+.bar { border-bottom: 1px solid var(--line); }
+.bar .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; padding-block: 14px; }
+.rec { display: inline-flex; align-items: center; gap: 8px; }
+.rec::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--rec); animation: blink 1.4s steps(2, start) infinite; }
+@keyframes blink { to { visibility: hidden; } }
+
+/* hero */
+.hero .wrap { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, .75fr); gap: 48px; align-items: center; padding-block: 56px 72px; }
+.hero-text { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
+.hero h1 em { font-style: normal; color: var(--key); }
+.stats { display: flex; flex-wrap: wrap; gap: 12px 32px; padding-top: 8px; border-top: 1px solid var(--line); }
+.stats div { display: flex; flex-direction: column; }
+.stats b { font-family: var(--display); font-size: 1.9rem; font-weight: 500; font-variant-numeric: tabular-nums; }
+.stats span { font-size: .85rem; color: var(--muted); }
+
+/* phone 9x16 */
+.phone { width: 100%; max-width: 330px; justify-self: center; aspect-ratio: 9 / 16; border: 2px solid var(--ink); border-radius: 28px; background: var(--card); padding: 14px; display: flex; flex-direction: column; gap: 8px; position: relative; overflow: hidden; }
+.phone-head { display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.phone-head strong { font-size: .9rem; }
+.msgs { display: flex; flex-direction: column; gap: 8px; font-size: .8rem; line-height: 1.4; overflow: hidden; }
+.m { padding: 8px 10px; border-radius: 14px; max-width: 86%; }
+.m.u { align-self: flex-end; background: var(--panel); border-bottom-right-radius: 4px; }
+.m.b { align-self: flex-start; background: var(--key-soft); border-bottom-left-radius: 4px; }
+.lead-card { margin-top: auto; border: 1.5px dashed var(--key); border-radius: 12px; padding: 8px 10px; font-family: var(--mono); font-size: .68rem; line-height: 1.5; }
+.lead-card b { color: var(--key); }
+.typing { display: inline-flex; gap: 3px; }
+.typing i { width: 5px; height: 5px; border-radius: 50%; background: var(--muted); animation: dot 1.2s infinite; }
+.typing i:nth-child(2) { animation-delay: .2s; } .typing i:nth-child(3) { animation-delay: .4s; }
+@keyframes dot { 50% { opacity: .25; } }
+.phone-note { position: absolute; top: 10px; right: -2px; }
+
+/* frames (sections) */
+.frame { border-top: 1px solid var(--line); }
+.frame > .wrap { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 32px; padding-block: 64px; }
+.frame-rail { display: flex; flex-direction: column; gap: 6px; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 24px); align-self: start; }
+.frame-body { display: flex; flex-direction: column; gap: 28px; min-width: 0; }
+
+/* audit */
+.audit { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+.audit div { background: var(--paper); padding: 20px; display: flex; flex-direction: column; gap: 8px; }
+.audit .tag { font-family: var(--mono); font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; }
+@media (min-width: 861px) { .audit > div:last-child:nth-child(3n+2) { grid-column: span 2; } }
+.audit .ok { color: var(--key); } .audit .gap { color: var(--rec); } .audit .ask { color: var(--muted); }
+
+/* timeline compare */
+.compare { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.track { border: 1px solid var(--line); border-radius: 4px; padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+.track.good { border-color: var(--key); background: var(--card); }
+.track h3 { font-size: 1.1rem; }
+.step { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 12px; }
+.step .tc { padding-top: 3px; }
+.step.bad p { color: var(--muted); }
+.step.loss p { color: var(--rec); font-weight: 600; }
+.step.win p { color: var(--key); font-weight: 600; }
+
+/* agents */
+.agents { display: flex; flex-direction: column; gap: 0; border-top: 2px solid var(--ink); }
+.agent { display: grid; grid-template-columns: 110px minmax(0, 1fr) minmax(0, .8fr); gap: 24px; padding-block: 28px; border-bottom: 1px solid var(--line); }
+.agent .no { font-family: var(--display); font-size: 2.6rem; font-weight: 500; line-height: 1; color: var(--muted); }
+.agent.main .no { color: var(--key); }
+.agent-main { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.agent-main p { color: var(--muted); }
+.agent ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: .92rem; }
+.agent li { padding-left: 18px; position: relative; }
+.agent li::before { content: ""; position: absolute; left: 0; top: .62em; width: 8px; height: 2px; background: var(--key); }
+.pill { align-self: flex-start; font-family: var(--mono); font-size: .7rem; text-transform: uppercase; letter-spacing: .06em; padding: 3px 8px; border-radius: 999px; border: 1px solid var(--key); color: var(--key); }
+.pill.solid { background: var(--key); color: var(--paper); }
+
+/* calculator */
+.calc { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; background: var(--card); border: 1px solid var(--line); border-radius: 4px; padding: 28px; }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field label { display: flex; justify-content: space-between; gap: 12px; font-size: .92rem; }
+.field output { font-family: var(--mono); font-weight: 600; font-variant-numeric: tabular-nums; }
+.fields { display: flex; flex-direction: column; gap: 22px; }
+input[type=range] { width: 100%; accent-color: var(--key); }
+input[type=range]:focus-visible { outline: 2px solid var(--key); outline-offset: 4px; }
+.result { display: flex; flex-direction: column; justify-content: center; gap: 12px; border-left: 1px solid var(--line); padding-left: 32px; }
+.result .big { font-family: var(--display); font-size: clamp(2.4rem, 5vw, 3.6rem); font-weight: 700; color: var(--rec); font-variant-numeric: tabular-nums; line-height: 1; }
+.result small { color: var(--muted); font-size: .85rem; }
+
+/* pilot plan */
+.plan { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; border: 1px solid var(--line); }
+.plan div { padding: 20px; display: flex; flex-direction: column; gap: 8px; border-right: 1px solid var(--line); }
+.plan div:last-child { border-right: 0; }
+.plan p { font-size: .92rem; color: var(--muted); }
+
+/* cta */
+.cta { background: var(--ink); color: var(--paper); }
+.cta .wrap { padding-block: 40px; }
+/* видоискатель камеры: уголки-скобки, REC и таймкод */
+.vf {
+  position: relative; display: flex; flex-direction: column; align-items: center; gap: 20px;
+  text-align: center; padding: 44px 20px 36px; max-width: 640px; margin: 0 auto;
+  --c: var(--key); --l: 22px; --t: 2px;
+  background:
+    linear-gradient(var(--c), var(--c)) top left / var(--l) var(--t) no-repeat,
+    linear-gradient(var(--c), var(--c)) top left / var(--t) var(--l) no-repeat,
+    linear-gradient(var(--c), var(--c)) top right / var(--l) var(--t) no-repeat,
+    linear-gradient(var(--c), var(--c)) top right / var(--t) var(--l) no-repeat,
+    linear-gradient(var(--c), var(--c)) bottom left / var(--l) var(--t) no-repeat,
+    linear-gradient(var(--c), var(--c)) bottom left / var(--t) var(--l) no-repeat,
+    linear-gradient(var(--c), var(--c)) bottom right / var(--l) var(--t) no-repeat,
+    linear-gradient(var(--c), var(--c)) bottom right / var(--t) var(--l) no-repeat;
+}
+.vf-rec, .vf-tc { position: absolute; top: 12px; font-size: .7rem; color: var(--paper); opacity: .75; }
+.vf-rec { left: 16px; display: inline-flex; align-items: center; gap: 8px; }
+.vf-rec::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--rec); animation: blink 1.4s steps(2, start) infinite; }
+.vf-tc { right: 16px; font-variant-numeric: tabular-nums; }
+.cta h2 { font-size: clamp(1.8rem, 4.5vw, 2.8rem); line-height: 1; position: relative; z-index: 1; }
+.cta h2 em { font-style: normal; color: var(--key); display: block; }
+.cta-btn {
+  position: relative; z-index: 1;
+  display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center;
+  background: var(--key); color: var(--paper);
+  font-family: var(--body); font-weight: 600; font-size: 1rem;
+  padding: 11px 20px; border-radius: 999px; text-decoration: none;
+  transition: transform .2s ease, box-shadow .2s ease;
+  box-shadow: 0 0 0 0 var(--key);
+}
+.cta-nick { font-family: var(--mono); font-weight: 400; font-size: .85rem; opacity: .85; user-select: all; }
+.cta-btn:hover { transform: translateY(-2px); box-shadow: 0 0 0 6px color-mix(in srgb, var(--key) 25%, transparent); }
+.cta-btn:focus-visible { outline: 2px solid var(--paper); outline-offset: 4px; }
+@media (max-width: 520px) { .vf { padding: 40px 8px 28px; --l: 18px; } .vf-tc { display: none; } }
+footer .wrap { padding-block: 24px; }
+
+@media (max-width: 860px) {
+  .hero .wrap { grid-template-columns: minmax(0, 1fr); padding-block: 40px 56px; }
+  .frame > .wrap { grid-template-columns: minmax(0, 1fr); gap: 16px; padding-block: 48px; }
+  .frame-rail { position: static; flex-direction: row; gap: 12px; }
+  .audit { grid-template-columns: minmax(0, 1fr); }
+  .compare { grid-template-columns: minmax(0, 1fr); }
+  .agent { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .calc { grid-template-columns: minmax(0, 1fr); padding: 20px; }
+  .result { border-left: 0; padding-left: 0; border-top: 1px solid var(--line); padding-top: 20px; }
+  .plan { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .plan div:nth-child(2) { border-right: 0; }
+  .plan div:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+}
+@media (max-width: 420px) {
+  .plan { grid-template-columns: minmax(0, 1fr); }
+  .plan div { border-right: 0; border-bottom: 1px solid var(--line); }
+  .plan div:last-child { border-bottom: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rec::before, .vf-rec::before, .typing i { animation: none; }
+  .cta-btn { transition: none; }
+}
+</style>
+
+<div class="bar">
+  <div class="wrap">
+    <span class="tc rec">REC · Коммерческое предложение</span>
+    <span class="tc">Для Sotavoff Production и AI STUDIO · октябрь 2026</span>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-text">
+      <span class="tc">Кадр 00 · Логлайн</span>
+      <h1>Ваши ролики собирают миллионы просмотров. Пусть теперь <em>собирают заявки</em></h1>
+      <p class="lead">Мы ставим AI-агентов, которые отвечают клиенту за минуту в любое время суток, собирают бриф по вашим правилам и отдают продюсеру готовую карточку лида. Менеджер подключается к готовому брифу, а не начинает переписку с нуля.</p>
+      <div class="stats">
+        <div><b>~1 мин</b><span>ответ клиенту, 24/7</span></div>
+        <div><b>5 полей</b><span>бриф собран до звонка</span></div>
+        <div><b>3 канала</b><span>сайт, Telegram, WhatsApp</span></div>
+      </div>
+    </div>
+
+    <div class="phone" aria-label="Пример диалога AI-менеджера с клиентом">
+      <div class="phone-head">
+        <strong>AI-менеджер студии</strong>
+        <span class="tc">онлайн</span>
+      </div>
+      <div class="msgs">
+        <div class="m u">Здравствуйте! Нужен AI-ролик к открытию кофейни</div>
+        <div class="m b">Здравствуйте! Сделаем. Какой формат нужен: вертикальный 9×16 для Reels или горизонтальный? И примерно какой хронометраж?</div>
+        <div class="m u">Вертикальный, секунд 30. Лучше серию из трёх</div>
+        <div class="m b">Пакет из 3 роликов по 30 с. Покажу похожий кейс из пекарни. К какой дате нужен запуск?</div>
+        <div class="m u">Через три недели</div>
+        <div class="m b">Успеваем: бриф → сценарий → кадры → анимация → монтаж. Передаю продюсеру, он напишет вам сегодня. Как к вам обращаться?</div>
+        <span class="typing" aria-hidden="true"><i></i><i></i><i></i></span>
+      </div>
+      <div class="lead-card">
+        <b>ГОРЯЧИЙ ЛИД → продюсеру</b><br>
+        Пакет 3 × 30 с · 9×16 · AI<br>
+        Ниша: кофейня · запуск через 3 нед.
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="frame">
+  <div class="wrap">
+    <div class="frame-rail"><span class="tc key">Кадр 01</span><span class="tc">Что мы увидели</span></div>
+    <div class="frame-body">
+      <h2>Продакшн уровня Ozon и Яндекса. Приём заявок на уровне формы</h2>
+      <div class="audit">
+        <div><span class="tag ok">Есть</span><h3>Сильная витрина</h3><p>Два сайта, шоурил, кейсы с топ-брендами, калькулятор стоимости, 1,5 млрд просмотров у клиентов.</p></div>
+        <div><span class="tag gap">Пробел</span><h3>На сайте нет диалога</h3><p>На сайтах нет ни чата, ни бота: кнопка «Нужна помощь менеджера?» открывает ту же форму. Спросить «сколько стоит» или «как быстро» на сайте некому, можно только оставить телефон.</p></div>
+        <div><span class="tag ok">Есть</span><h3>Быстрый ответ, но руками</h3><p>Сразу после заявки менеджер сам пишет клиенту в Telegram. Скорость есть, но каждая переписка — это время менеджера, и вопросы для брифа он задаёт каждый раз с нуля.</p></div>
+        <div><span class="tag ok">Есть</span><h3>Своя аудитория</h3><p>63,7 тыс. подписчиков в Instagram, AI-сериал с тысячами лайков и сотнями комментариев, школа на 3000+ учеников. Всё это можно превратить в постоянную воронку.</p></div>
+        <div><span class="tag gap">Пробел</span><h3>Комментарии без ответа</h3></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="frame">
+  <div class="wrap">
+    <div class="frame-rail"><span class="tc key">Кадр 02</span><span class="tc">Один и тот же лид</span></div>
+    <div class="frame-body">
+      <h2>Что меняется для менеджера</h2>
+      <p class="lead">Сейчас менеджер пишет клиенту в Telegram сразу после заявки. С агентом клиент попадает в Telegram сам, прямо из формы, и переписку до готового брифа ведёт AI. Время и клиент ниже условные, это пример.</p>
+      <div class="compare">
+        <div class="track">
+          <span class="tc">Пример · как сейчас</span>
+          <div class="step bad"><span class="tc">14:00</span><p>Клиент оставляет заявку на сайте</p></div>
+          <div class="step bad"><span class="tc">14:02</span><p>Менеджер пишет ему в Telegram и начинает расспрашивать</p></div>
+          <div class="step bad"><span class="tc">14:02–15:00</span><p>Формат, хронометраж, сроки, бюджет, примеры работ — всё вручную, вопрос за вопросом</p></div>
+          <div class="step loss"><span class="tc">15:00</span><p>Пока идёт эта переписка, следующие заявки ждут своей очереди</p></div>
+        </div>
+        <div class="track good">
+          <span class="tc key">Пример · с AI-агентом</span>
+          <div class="step"><span class="tc">14:00</span><p>Клиент отправляет форму, и сайт сразу открывает ему Telegram с AI-агентом. Заявка уже у агента</p></div>
+          <div class="step"><span class="tc">14:01</span><p>Агент показывает похожий кейс и задаёт ваши вопросы для брифа</p></div>
+          <div class="step"><span class="tc">14:07</span><p>Бриф собран, лид оценён, карточка у менеджера</p></div>
+          <div class="step win"><span class="tc">14:08</span><p>Менеджер начинает с предложения. Агент в это время ведёт сразу несколько других клиентов</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="frame">
+  <div class="wrap">
+    <div class="frame-rail"><span class="tc key">Кадр 03</span><span class="tc">Состав команды</span></div>
+    <div class="frame-body">
+      <h2>Пять агентов, которые можно запустить</h2>
+      <div class="agents">
+        <article class="agent main">
+          <span class="no">01</span>
+          <div class="agent-main">
+            <span class="pill solid">Старт с него</span>
+            <h3>AI-менеджер заявок</h3>
+            <p>Отвечает на сайтах, в Telegram и WhatsApp строго по вашей базе знаний: услуги, этапы, сроки, кейсы. Ничего не выдумывает.</p>
+          </div>
+          <ul>
+            <li>После формы на сайте клиент сразу попадает к агенту в Telegram, кнопка «Нужна помощь менеджера?» тоже ведёт к нему</li>
+            <li>Собирает бриф по вашим вопросам: задача, формат, хронометраж, бюджет, сроки</li>
+            <li>Оценивает теплоту: горячих передаёт менеджеру, замолчавшим сам пишет повторно через день</li>
+            <li>Заявки и переписка попадают в CRM или рабочий чат</li>
+          </ul>
+        </article>
+        <article class="agent">
+          <span class="no">02</span>
+          <div class="agent-main">
+            <span class="pill">Охват → лиды</span>
+            <h3>Комментарий → директ</h3>
+            <p>Сейчас в подписях есть только «сохраняй и подписывайся», кодовых слов нет. А сотни комментариев под сериалом — готовая аудитория, которой просто никто не пишет.</p>
+          </div>
+          <ul>
+            <li><b>«СЕРИЯ»</b> — личное сообщение, когда выйдет новая серия или 3 сезон, плюс приглашение в Telegram-канал</li>
+            <li><b>«SYNTX»</b> — партнёрская ссылка и бонусы сразу в личку, а не «ищите в шапке»</li>
+            <li><b>«РОЛИК»</b> — кейсы AI STUDIO и бриф, дальше разговор ведёт AI-менеджер</li>
+            <li>Ту же механику можно продавать клиентам вместе с роликами: рилс + «пишите ХОЧУ» под ключ</li>
+          </ul>
+        </article>
+        <article class="agent">
+          <span class="no">03</span>
+          <div class="agent-main">
+            <span class="pill">Школа</span>
+            <h3>Бот онлайн-школы</h3>
+            <p>Воронка из Telegram-канала: прогрев, оплата, доступ в закрытый чат, напоминания и онбординг учеников без ручной работы.</p>
+          </div>
+          <ul>
+            <li>Оплата и подписка с автопродлением</li>
+            <li>Автоматическая выдача и отзыв доступа</li>
+            <li>Ответы на типовые вопросы учеников</li>
+          </ul>
+        </article>
+        <article class="agent">
+          <span class="no">04</span>
+          <div class="agent-main">
+            <span class="pill">Допродажа клиентам</span>
+            <h3>AI-аналитик Instagram</h3>
+            <p>Отчёт клиенту за день, неделю и месяц: какие ролики залетели, какие форматы и часы работают, выводы от AI. Ваш результат становится виден в цифрах.</p>
+          </div>
+          <ul>
+            <li>Отчёты приходят в Telegram по расписанию</li>
+            <li>Аудит профиля как лид-магнит для новых клиентов</li>
+            <li>Аргумент продлить контракт</li>
+          </ul>
+        </article>
+        <article class="agent">
+          <span class="no">05</span>
+          <div class="agent-main">
+            <span class="pill">Внутри студии</span>
+            <h3>Брифер и трекер продакшна</h3>
+            <p>Клиент наговаривает задачу голосом, сценарист получает структурированный бриф. Каждый заказ движется по этапам со сроками.</p>
+          </div>
+          <ul>
+            <li>Голос → текст → бриф</li>
+            <li>Статусы: сценарий, кадры, анимация, монтаж, правки</li>
+            <li>Напоминания о дедлайнах команде</li>
+          </ul>
+        </article>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="frame">
+  <div class="wrap">
+    <div class="frame-rail"><span class="tc key">Кадр 04</span><span class="tc">Цена потерь</span></div>
+    <div class="frame-body">
+      <h2>Сколько стоят заявки, которые не дошли до брифа</h2>
+      <p class="lead">Подвиньте ползунки под свои цифры. Примерный расчёт: значения по умолчанию условные, средний чек взят из калькулятора на сайте. «Пропадают» — клиент перестал отвечать в переписке или ушёл к другим.</p>
+      <div class="calc">
+        <div class="fields">
+          <div class="field">
+            <label for="leads">Заявок в месяц <output id="leadsOut">40</output></label>
+            <input type="range" id="leads" min="5" max="300" step="5" value="40">
+          </div>
+          <div class="field">
+            <label for="lost">Пропадают до брифа <output id="lostOut">20%</output></label>
+            <input type="range" id="lost" min="5" max="60" step="5" value="20">
+          </div>
+          <div class="field">
+            <label for="conv">Из них могли стать сделкой <output id="convOut">25%</output></label>
+            <input type="range" id="conv" min="5" max="60" step="5" value="25">
+          </div>
+          <div class="field">
+            <label for="check">Средний чек <output id="checkOut">160 000 ₽</output></label>
+            <input type="range" id="check" min="50000" max="1000000" step="10000" value="160000">
+          </div>
+        </div>
+        <div class="result" aria-live="polite">
+          <span class="tc">Выручка, которая уходит каждый месяц</span>
+          <span class="big" id="loss">320 000 ₽</span>
+          <small id="lossNote">Это 2 сделки в месяц. Агенту достаточно вернуть одну из них, чтобы окупиться.</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="frame">
+  <div class="wrap">
+    <div class="frame-rail"><span class="tc key">Кадр 05</span><span class="tc">Пилот</span></div>
+    <div class="frame-body">
+      <h2>Как запускаем: четыре недели до первых лидов</h2>
+      <p class="lead">Начинаем с агентов 01 и 02. Это главная дыра в продажах, и эффект виден в первый же месяц. Школу и аналитику подключаем вторым этапом.</p>
+      <div class="plan">
+        <div><span class="tc key">Неделя 1</span><h3>Бриф</h3><p>Собираем базу знаний: услуги, этапы, сроки, кейсы, частые вопросы и ваши вопросы для брифа.</p></div>
+        <div><span class="tc key">Неделя 2</span><h3>Демо</h3><p>Агент отвечает на ваших реальных сценариях. Вы проверяете тон и правите ответы.</p></div>
+        <div><span class="tc key">Неделя 3</span><h3>Запуск</h3><p>Подключаем сайты, Telegram и WhatsApp, передачу лидов продюсеру и в CRM.</p></div>
+        <div><span class="tc key">Неделя 4</span><h3>Донастройка</h3><p>Разбираем живые диалоги, докручиваем ответы и считаем, сколько заявок агент вернул.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="wrap">
+    <div class="vf">
+      <span class="vf-rec tc">REC</span>
+      <span class="vf-tc tc">00:00:00:00</span>
+      <h2>Соберу <em>демо бота</em></h2>
+      <a class="cta-btn" href="https://t.me/Olesya_saet" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M21.4 4.2 2.9 11.3c-1.3.5-1.3 1.2-.2 1.5l4.7 1.5 1.8 5.6c.2.6.1.9.8.9.5 0 .7-.2 1-.5l2.3-2.2 4.7 3.5c.9.5 1.5.2 1.7-.8l3.1-14.6c.3-1.3-.5-1.9-1.4-1.5Zm-3.6 3.3-8.6 7.8-.3 3.6-1.6-5 9.9-6.3c.5-.3.9-.1.6-.1Z"/></svg>
+        <span>Написать в Telegram</span>
+        <span class="cta-nick">@Olesya_saet</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap"><span class="tc">Цифры студии взяты с sotavoff.ru и spaistudio.ru. Диалог, сценарий заявки и расчёт в калькуляторе приведены для примера.</span></div>
+</footer>
+
+<script>
+(function () {
+  var fmt = function (n) { return Math.round(n).toLocaleString("ru-RU").replace(/,/g, " ") + " ₽"; };
+  var ids = ["leads", "lost", "conv", "check"];
+  var el = {};
+  ids.forEach(function (id) { el[id] = document.getElementById(id); });
+  function deals(n) {
+    var m10 = n % 10, m100 = n % 100;
+    if (m10 === 1 && m100 !== 11) return "сделка";
+    if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return "сделки";
+    return "сделок";
+  }
+  function update() {
+    var leads = +el.leads.value, lost = +el.lost.value, conv = +el.conv.value, check = +el.check.value;
+    document.getElementById("leadsOut").textContent = leads;
+    document.getElementById("lostOut").textContent = lost + "%";
+    document.getElementById("convOut").textContent = conv + "%";
+    document.getElementById("checkOut").textContent = fmt(check);
+    var d = leads * lost / 100 * conv / 100;
+    document.getElementById("loss").textContent = fmt(d * check);
+    var shown = d < 1 ? d.toFixed(1).replace(".", ",") : String(Math.round(d));
+    var word = d < 1 ? "сделки" : deals(Math.round(d));
+    document.getElementById("lossNote").textContent = d < 1
+      ? "Это " + shown + " " + word + " в месяц, то есть одна крупная сделка за пару месяцев."
+      : "Это " + shown + " " + word + " в месяц. Агенту достаточно вернуть одну из них, чтобы окупиться.";
+  }
+  ids.forEach(function (id) { el[id].addEventListener("input", update); });
+  update();
+})();
+</script>
+
+</html>
